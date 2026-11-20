@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<title>بارچین | فروشگاه آنلاین BARGCHEN</title>
+<meta name="description" content="بارچین؛ فروشگاه آنلاین برای کشف محصولات منتخب خانه، دیجیتال، مد و سبک زندگی.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EAF3EA">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+ /* Layout: sticky glass header -> hero stage (3D scene is the product) -> showroom -> shelves -> promos.
+    One fixed canvas behind the page draws falling leaves; one canvas above it draws every 3D product into its own slot. */
+ --bg:#EAF3EA;--ink:#14271D;--muted:#5A7164;--card:#FFFFFF;--line:#D3E3D7;
+ --em:#168653;--deep:#0B4A30;--mint:#A9E2BD;--coral:#E4684F;
+ --f-body:'Vazirmatn',Tahoma,sans-serif;--f-latin:'Space Grotesk','Vazirmatn',Arial,sans-serif;
+ color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:35;background:var(--bg)}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--em);outline-offset:2px}
+#bg3d{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+#fg3d{position:fixed;inset:0;width:100%;height:100%;z-index:20;pointer-events:none}
+.no-gl #bg3d,.no-gl #fg3d{display:none}
+.wrap{max-width:1280px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.slot{position:absolute;inset:0;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.slot:active{cursor:grabbing}
+.slot .glyph{display:none;position:absolute;inset:0;place-items:center;font-size:72px;font-weight:900;color:#168653;opacity:.35}
+.no-gl .slot .glyph{display:grid}
+
+.announcement{background:linear-gradient(90deg,#075B3B,#128653 52%,#20A36B);color:#fff;text-align:center;padding:9px 16px;font-size:12px}
+.announcement b{color:#D7F8E5}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(234,243,234,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.header{display:flex;align-items:center;gap:20px;padding-block:12px}
+.brand{font-family:var(--f-latin);font-size:25px;font-weight:700;letter-spacing:2px;direction:ltr;color:var(--deep);min-width:150px}
+.brand span{color:var(--em)}
+.brand small{display:block;font:600 11px var(--f-body);text-align:right;letter-spacing:4px;color:#718477;margin-top:2px}
+.search{flex:1;min-width:0;height:46px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 16px;color:var(--em);box-shadow:0 4px 14px rgba(20,74,45,.06)}
+.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--ink)}
+.search input::placeholder{color:#8A9A90}
+.search:focus-within{border-color:var(--em);box-shadow:0 0 0 3px rgba(22,134,83,.14)}
+.head-actions{display:flex;gap:10px}
+.icon-btn{position:relative;height:44px;min-width:44px;border:1px solid var(--line);border-radius:13px;background:#fff;color:#264333;transition:.2s}
+.icon-btn:hover{border-color:var(--em);transform:translateY(-2px)}
+.count{position:absolute;top:-6px;left:-6px;background:var(--coral);color:#fff;border-radius:50%;font-size:10px;min-width:18px;height:18px;display:grid;place-items:center;font-weight:800}
+.nav{display:flex;gap:30px;padding-block:13px;overflow-x:auto;white-space:nowrap}
+.nav a{color:#4A6354;text-decoration:none;font-size:13px}
+.nav a:hover,.nav a.hot{color:var(--em)}
+
+.hero{margin-top:18px;border-radius:30px;border:1px solid #CFE2D4;position:relative;overflow:hidden;
+ background:radial-gradient(ellipse at 26% 52%,#BFE8CE 0,transparent 46%),linear-gradient(115deg,#FFFFFF,#EEF6EF 55%,#DCEEE1);
+ box-shadow:0 28px 60px rgba(12,66,40,.14)}
+.hero::after{content:"";position:absolute;width:520px;height:520px;border:1px solid rgba(22,134,83,.14);border-radius:50%;right:-180px;top:-240px;box-shadow:0 0 0 36px rgba(22,134,83,.04),0 0 0 76px rgba(22,134,83,.03);pointer-events:none}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:16px;padding:36px 6%;min-height:560px}
+.hero-copy{position:relative;z-index:1;min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--em);font:600 12px var(--f-latin);letter-spacing:1.2px;direction:ltr}
+.eyebrow::before{content:"";width:30px;height:2px;background:var(--coral)}
+h1{font-size:clamp(34px,4.6vw,62px);line-height:1.45;margin:16px 0 12px;font-weight:900;max-width:600px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--em)}
+.hero-copy p{color:#566B5E;line-height:2.1;max-width:480px;font-size:14px}
+.hero-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.primary,.secondary{padding:13px 24px;border-radius:13px;font-weight:800;border:1px solid var(--em);transition:transform .22s,box-shadow .22s}
+.primary{background:linear-gradient(135deg,#1A9A5F,#0E6840 60%,#075B3B);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px rgba(9,91,53,.28)}
+.primary:hover{transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 16px 28px rgba(9,91,53,.34)}
+.secondary{background:#fff;color:#264333;border-color:#D1E2D6}
+.secondary:hover{border-color:var(--em);color:var(--em);transform:translateY(-3px)}
+.hero-visual{position:relative;height:520px;min-width:0}
+.float-card{position:absolute;background:rgba(255,255,255,.92);border:1px solid #D6E7DA;border-radius:15px;padding:12px 16px;box-shadow:0 14px 30px rgba(20,76,48,.14)}
+.float-card b{display:block;color:var(--deep);font-size:13px}
+.float-card small{color:#6C8173;font-size:10px}
+.float-card.one{right:0;top:30px}
+.float-card.two{left:0;bottom:46px}
+.hint{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:11px;color:#5A7164;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:20px;padding:5px 14px;white-space:nowrap}
+
+.trust{display:grid;grid-template-columns:repeat(4,1fr);margin:22px 0 70px;border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 12px 30px rgba(35,74,49,.06)}
+.trust-item{display:flex;align-items:center;gap:13px;padding:18px 20px;border-left:1px solid #E7EFE9;min-width:0}
+.trust-item:last-child{border-left:0}
+.trust-icon{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#E8F5EC;color:var(--em);font-size:20px}
+.trust b{display:block;font-size:12px}
+.trust small{color:#778B7D;font-size:10px}
+
+.section{padding-bottom:70px;scroll-margin-top:100px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:24px}
+.kicker{color:var(--em);font:600 11px var(--f-latin);letter-spacing:1.6px}
+.section-head h2{font-size:28px;margin:6px 0 0}
+.section-head p{color:#75877B;font-size:12px;margin:6px 0 0}
+.view-all{background:none;border:0;color:var(--em);font-size:12px}
+
+.categories{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.category{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s,border-color .3s;box-shadow:0 12px 28px rgba(33,76,50,.08)}
+.category:hover{transform:translateY(-7px);border-color:#9CCDAA;box-shadow:0 24px 40px rgba(22,134,83,.16)}
+.stage{position:relative;height:170px;background:radial-gradient(circle at 50% 45%,#D9EFE0,#F1F7F2 62%,#E8F1EA)}
+.stage .slot{inset:6px}
+.category .meta{position:relative;padding:14px 18px 18px}
+.category b{font-size:15px}
+.category small{display:block;color:#7A8D80;font-size:11px;margin-top:4px}
+.category .arrow{position:absolute;left:18px;bottom:18px;color:var(--coral);font-size:20px}
+
+.show{display:grid;grid-template-columns:1fr 1.2fr;gap:22px;align-items:stretch}
+.show-panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 14px 32px rgba(33,76,50,.08);display:flex;flex-direction:column;gap:14px;min-width:0}
+.show-panel .cat{color:var(--em);font-size:12px;font-weight:700}
+.show-panel h3{margin:0;font-size:30px;line-height:1.4}
+.show-panel p{margin:0;color:var(--muted);line-height:2}
+.show-price{font-size:22px;font-weight:900;color:var(--deep)}
+.show-price small{display:block;color:#8A9A90;font-size:11px;font-weight:400}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.thumbs button{border:1px solid var(--line);background:#F4F9F5;border-radius:30px;padding:8px 14px;font-size:12px;color:#4A6354}
+.thumbs button.active,.thumbs button:hover{background:var(--em);border-color:var(--em);color:#fff}
+.show-stage{position:relative;height:540px;border-radius:22px;border:1px solid #CFE2D4;overflow:hidden;background:radial-gradient(circle at 50% 42%,#CDEBD7,#EAF4EC 56%,#DDEBE0);box-shadow:0 20px 44px rgba(12,66,40,.13)}
+.show-stage::after{content:"";position:absolute;inset:auto 0 0;height:36%;background:linear-gradient(0deg,rgba(22,134,83,.12),transparent);pointer-events:none}
+
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin:6px 0 22px}
+.filters button{border:1px solid var(--line);background:#fff;color:#536B5C;border-radius:30px;padding:9px 18px;font-size:12px;transition:.2s}
+.filters button.active,.filters button:hover{background:var(--em);color:#fff;border-color:var(--em);font-weight:800}
+.products{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.product{background:#fff;border:1px solid #DDE8DF;border-radius:18px;overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;min-width:0;box-shadow:0 12px 28px rgba(35,74,49,.07)}
+.product:hover{transform:translateY(-7px);border-color:#9CCDAA;box-shadow:0 24px 40px rgba(22,134,83,.15)}
+.product-photo{position:relative;height:230px;background:radial-gradient(circle at 50% 40%,#DDF0E3,#F1F7F2 54%,#E8F1EA)}
+.product-photo .slot{inset:8px 8px 14px}
+.tag{position:absolute;top:12px;right:12px;z-index:2;background:#E5F4E9;color:#0E6840;padding:5px 10px;border-radius:20px;font-size:10px;font-weight:800}
+.heart,.zoom{position:absolute;z-index:2;width:34px;height:34px;border-radius:50%;border:1px solid #D3E3D7;background:rgba(255,255,255,.92);color:#264333}
+.heart{left:12px;top:12px}
+.zoom{left:12px;bottom:12px}
+.heart:hover,.zoom:hover{border-color:var(--em);color:var(--em)}
+.product-info{padding:15px}
+.product-info h3{font-size:13px;margin:0 0 6px}
+.product-info p{font-size:11px;color:#7A8D80;margin:0 0 14px;min-height:18px}
+.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.price{font-size:13px;font-weight:900;color:var(--deep)}
+.price small{display:block;color:#8A9A90;font-size:9px;font-weight:400}
+.add{background:var(--em);color:#fff;border:0;border-radius:10px;padding:9px 13px;font-size:11px;font-weight:800;transition:.2s}
+.add:hover{background:#0E6840;transform:translateY(-2px)}
+.none{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+
+.promo{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-bottom:70px;perspective:1100px}
+.promo-card{position:relative;min-height:230px;border-radius:22px;overflow:hidden;padding:30px;color:#fff;background:linear-gradient(120deg,#075B3B,#168653 56%,#35AD75);box-shadow:0 24px 48px rgba(8,83,46,.25);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out;will-change:transform}
+.promo-card:nth-child(2){background:linear-gradient(120deg,#0B3B2A,#126B46 58%,#2B9E68)}
+.promo-card::after{content:"✦";position:absolute;left:30px;top:6px;font-size:160px;color:rgba(255,255,255,.1);transform:translateZ(40px)}
+.promo-card .kicker{color:#C6F0D6}
+.promo-card h3{font-size:24px;margin:8px 0}
+.promo-card p{color:#D9F3E2;font-size:12px;max-width:300px;line-height:2;margin:0 0 14px}
+.promo-card .secondary{background:#fff;color:#0E6840}
+
+.footer{background:#123D2B;padding:44px 0 20px;color:#EAF7EE}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:30px}
+.footer .brand{color:#fff}
+.footer .brand span{color:#8BCF9F}
+.footer p,.footer a{color:#C1D9C9;font-size:11px;line-height:2.3;text-decoration:none;display:block;margin:0}
+.footer a:hover{color:#fff}
+.footer h4{font-size:13px;color:#fff;margin:0 0 6px}
+.copyright{border-top:1px solid rgba(255,255,255,.14);margin-top:28px;padding-top:16px;color:#9DBBA9;font-size:10px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+.cart-panel{position:fixed;inset:0 0 0 auto;width:min(420px,100%);background:#fff;z-index:50;box-shadow:-18px 0 50px rgba(11,64,37,.2);padding:22px;padding-top:calc(22px + env(safe-area-inset-top,0px));padding-right:max(22px,env(safe-area-inset-right,0px));transform:translateX(110%);visibility:hidden;transition:transform .3s,visibility .3s;border-left:1px solid var(--line)}
+.cart-panel.open{transform:none;visibility:visible}
+.cart-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5EEE7;padding-bottom:14px}
+.cart-head h3{margin:0}
+.close{border:1px solid var(--line);background:#F4F9F5;border-radius:10px;width:38px;height:38px}
+.cart-items{max-height:55vh;overflow:auto}
+.cart-item{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;border-bottom:1px solid #E5EEE7;padding:15px 0;font-size:12px}
+.cart-item small{color:#7A8D80}
+.qty{display:flex;align-items:center;gap:7px}
+.qty button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#F4F9F5}
+.remove{border:0;background:none;color:#C4573F}
+.empty{text-align:center;color:#8A9A90;padding:55px 0}
+.cart-total{border-top:1px solid #E5EEE7;padding-top:16px;margin-top:14px;display:flex;justify-content:space-between;font-weight:800}
+.checkout{width:100%;margin-top:16px}
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));right:50%;transform:translate(50%,20px);opacity:0;pointer-events:none;background:#075B3B;color:#fff;padding:12px 20px;border-radius:12px;z-index:60;font-size:12px;font-weight:800;transition:.25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(50%,0)}
+
+@media(max-width:900px){
+ .header{flex-wrap:wrap;gap:12px}
+ .search{order:3;flex-basis:100%}
+ .hero-inner{grid-template-columns:1fr;padding:30px 6% 10px;min-height:0}
+ .hero-visual{height:380px}
+ .trust{grid-template-columns:repeat(2,1fr)}
+ .trust-item:nth-child(2){border-left:0}
+ .trust-item:nth-child(-n+2){border-bottom:1px solid #E7EFE9}
+ .categories,.products{grid-template-columns:repeat(2,1fr)}
+ .show{grid-template-columns:1fr}
+ .show-stage{order:-1;height:400px}
+ .promo{grid-template-columns:1fr}
+ .footer-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+ .announcement{font-size:10px}
+ .brand{font-size:20px;min-width:0}
+ .head-actions{margin-right:auto}
+ .nav{gap:18px}
+ .nav a{font-size:12px}
+ .hero{border-radius:22px}
+ h1{font-size:32px}
+ .hero-visual{height:320px}
+ .float-card{padding:8px 11px}
+ .float-card.one{top:8px}
+ .float-card.two{bottom:30px}
+ .trust{margin:16px 0 48px}
+ .trust-item{padding:14px 10px;gap:9px}
+ .trust-icon{width:34px;height:34px;font-size:16px}
+ .section{padding-bottom:48px}
+ .section-head h2{font-size:22px}
+ .categories,.products{gap:10px}
+ .stage{height:130px}
+ .category .meta{padding:10px 12px 14px}
+ .category b{font-size:13px}
+ .product-photo{height:170px}
+ .product-info{padding:11px}
+ .price{font-size:11px}
+ .add{font-size:10px;padding:8px}
+ .show-panel{padding:20px}
+ .show-panel h3{font-size:24px}
+ .show-stage{height:330px}
+ .footer-grid>div:first-child{grid-column:1/-1}
+}
+@media(prefers-reduced-motion:reduce){
+ *{transition:none!important;scroll-behavior:auto!important}
+ .promo-card{transform:none!important}
+}
+
+/* Functional checkout and management preview */
+.dialog-backdrop{position:fixed;inset:0;z-index:80;background:rgba(5,32,20,.58);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.dialog-backdrop.open{display:flex}
+.dialog{width:min(680px,100%);max-height:min(92vh,900px);overflow:auto;background:#f9fcf9;border:1px solid #cfe2d4;border-radius:22px;padding:22px;box-shadow:0 28px 80px rgba(5,45,26,.3)}
+.dialog.wide{width:min(1100px,100%)}
+.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+.dialog-head h2{font-size:20px;margin:0}.dialog-close{border:1px solid var(--line);background:#fff;border-radius:10px;width:38px;height:38px}
+.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:grid;gap:6px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:800;color:#355743}.field input,.field select,.field textarea{width:100%;min-width:0;border:1px solid #cfdfd2;border-radius:11px;padding:11px 12px;background:#fff;color:#14271d;outline:none}.field textarea{min-height:80px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--em);box-shadow:0 0 0 3px #1686531c}.dialog-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.admin-tabs{display:flex;gap:8px;overflow:auto;margin:0 0 16px}.admin-tabs button{border:1px solid var(--line);background:#fff;border-radius:30px;padding:9px 15px;white-space:nowrap}.admin-tabs button.active{background:var(--deep);color:white;border-color:var(--deep)}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.admin-stat{background:white;border:1px solid var(--line);border-radius:14px;padding:13px;min-width:0}.admin-stat small{display:block;color:var(--muted);font-size:11px}.admin-stat b{display:block;color:var(--deep);font-size:18px;margin-top:5px;overflow-wrap:anywhere}.admin-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}.admin-table{width:100%;border-collapse:collapse;min-width:620px;font-size:12px}.admin-table th,.admin-table td{padding:11px;text-align:right;border-bottom:1px solid #e6eee8;white-space:nowrap}.admin-table th{background:#eff6f0;color:#45604f}.admin-table tr:last-child td{border-bottom:0}.mini-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;font-size:11px}.mini-btn.danger{color:#b33f35}.admin-note{background:#fff8e8;border:1px solid #f1dca7;color:#755619;border-radius:12px;padding:11px 13px;font-size:11px;line-height:1.9;margin-bottom:14px}.empty-admin{text-align:center;padding:30px;color:#718477}.preview-admin-link{border:0;background:none;color:#c9ead3;text-decoration:underline;cursor:pointer;font:inherit;font-size:11px}
+@media(max-width:650px){.dialog{padding:16px;border-radius:16px}.field-grid{grid-template-columns:1fr}.admin-stats{grid-template-columns:repeat(2,1fr)}.admin-stat b{font-size:16px}}
+
+
+/* BARGCHEN premium depth pass — visual-only; storefront behavior remains unchanged */
+:root{
+ --bg:#E8F2E9;--line:#C9DED0;
+ --shadow-soft:0 14px 34px rgba(14,67,41,.10);
+ --shadow-deep:0 26px 58px rgba(8,62,36,.17);
+}
+body{
+ background:
+  radial-gradient(ellipse at 8% 8%,rgba(123,196,143,.16),transparent 32%),
+  radial-gradient(ellipse at 92% 34%,rgba(38,145,91,.10),transparent 30%),
+  linear-gradient(180deg,#EDF5EE 0%,#E5F0E7 48%,#F0F6F1 100%);
+}
+.top{background:rgba(239,247,240,.84);box-shadow:0 8px 28px rgba(18,75,45,.06)}
+.brand{text-shadow:0 2px 0 rgba(255,255,255,.9),0 8px 18px rgba(11,74,48,.12)}
+.search,.icon-btn,.float-card,.trust,.show-panel,.category,.product,.promo,.newsletter,.footer-card{
+ box-shadow:var(--shadow-soft);
+}
+.search{background:linear-gradient(145deg,#fff,#F4FAF5);border-color:#C8DDCE;box-shadow:inset 0 1px 0 #fff,0 8px 20px rgba(20,74,45,.07)}
+.icon-btn{background:linear-gradient(145deg,#fff,#EAF4EC);box-shadow:inset 0 1px 0 #fff,0 7px 16px rgba(20,74,45,.08)}
+.hero{
+ isolation:isolate;
+ background:
+  radial-gradient(ellipse at 74% 18%,rgba(255,255,255,.98),transparent 30%),
+  radial-gradient(ellipse at 24% 62%,#B9E4C8 0,transparent 48%),
+  linear-gradient(125deg,#FFFFFF 0%,#EFF8F0 48%,#D5EBDD 100%);
+ box-shadow:0 32px 72px rgba(12,66,40,.16),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(14,104,64,.08);
+}
+.hero::before{content:"";position:absolute;inset:12px;border:1px solid rgba(255,255,255,.72);border-radius:23px;pointer-events:none;z-index:-1}
+.hero::after{border-color:rgba(22,134,83,.18);box-shadow:0 0 0 34px rgba(22,134,83,.045),0 0 0 74px rgba(22,134,83,.035),0 0 70px rgba(22,134,83,.12)}
+.hero-visual{perspective:1100px}
+.float-card{background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(233,246,237,.9));border-color:rgba(177,211,188,.9);box-shadow:0 18px 36px rgba(15,76,44,.16),inset 0 1px 0 #fff;backdrop-filter:blur(12px)}
+.float-card.one{transform:rotateY(-9deg) rotateX(4deg)}
+.float-card.two{transform:rotateY(8deg) rotateX(-3deg)}
+.trust{background:linear-gradient(145deg,#fff,#F1F8F2);border-color:#C9DED0;box-shadow:0 18px 40px rgba(24,83,49,.09),inset 0 1px 0 #fff}
+.trust-icon{background:linear-gradient(145deg,#F5FFF7,#D9F0E0);box-shadow:inset 0 1px 0 #fff,0 6px 14px rgba(22,134,83,.10)}
+.section-head h2{text-shadow:0 2px 0 rgba(255,255,255,.75)}
+.category,.product,.show-panel{
+ transform-style:preserve-3d;
+ border-color:#D0E2D5;
+ background:linear-gradient(145deg,#FFFFFF 0%,#F8FCF8 72%,#EDF6EF 100%);
+ box-shadow:0 14px 28px rgba(24,83,49,.075),inset 0 1px 0 #fff;
+}
+.category:hover,.product:hover{
+ transform:translateY(-8px) perspective(900px) rotateX(1.2deg);
+ box-shadow:0 28px 48px rgba(14,103,58,.17),inset 0 1px 0 #fff;
+}
+.stage,.product-photo{
+ background:
+  radial-gradient(ellipse at 50% 36%,rgba(255,255,255,.98),transparent 35%),
+  radial-gradient(circle at 50% 48%,#D1EED9 0%,#E9F5EC 56%,#DDEBE0 100%);
+}
+.stage::after,.product-photo::after{
+ content:"";position:absolute;inset:8px;border-radius:14px;
+ background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 42%,rgba(17,115,65,.035));
+ border:1px solid rgba(255,255,255,.55);pointer-events:none;
+}
+.show-panel{box-shadow:0 20px 42px rgba(24,83,49,.10),inset 0 1px 0 #fff}
+.show-stage{
+ background:
+  radial-gradient(ellipse at 50% 32%,rgba(255,255,255,.95),transparent 34%),
+  radial-gradient(circle at 50% 48%,#C4E8D0,#E8F4EA 58%,#D4E8D9);
+ box-shadow:0 26px 54px rgba(12,66,40,.16),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -20px 45px rgba(14,104,64,.07);
+}
+.primary{box-shadow:inset 0 1px 0 rgba(255,255,255,.48),inset 0 -3px 0 rgba(0,0,0,.13),0 12px 24px rgba(9,91,53,.27)}
+.primary:active,.secondary:active,.icon-btn:active{transform:translateY(1px) scale(.985)}
+.filters button,.thumbs button{box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 5px 12px rgba(20,74,45,.06)}
+.product .meta{background:linear-gradient(180deg,#fff,#F8FCF8)}
+/* Subtle depth for remaining panels and form controls */
+input,textarea,select{accent-color:var(--em)}
+input:not([type=checkbox]):not([type=radio]),textarea,select{
+ border-color:#C9DED0;
+}
+@media (min-width:900px){
+ .hero-inner{transform-style:preserve-3d}
+ .hero-copy{transform:translateZ(16px)}
+ .hero-visual{transform:translateZ(24px)}
+}
+@media (prefers-reduced-motion:no-preference){
+ .float-card.one{animation:premiumFloatA 6s ease-in-out infinite}
+ .float-card.two{animation:premiumFloatB 7s ease-in-out infinite}
+ @keyframes premiumFloatA{0%,100%{translate:0 0}50%{translate:0 -8px}}
+ @keyframes premiumFloatB{0%,100%{translate:0 0}50%{translate:0 7px}}
+}
+@media (max-width:700px){
+ .hero{box-shadow:0 18px 38px rgba(12,66,40,.13),inset 0 1px 0 #fff}
+ .category:hover,.product:hover{transform:translateY(-3px)}
+ .float-card.one,.float-card.two{animation:none}
+}
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="bg3d" aria-hidden="true"></canvas>
+<canvas id="fg3d" aria-hidden="true"></canvas>
+<div class="announcement">✦ پیشنهادهای منتخب بارچین <b>تا ۳۰٪ فرصت خرید ویژه</b> — کیفیتی که در جزئیات دیده می‌شود</div>
+<div class="top"><div class="wrap"><header class="header">
+ <div class="brand">BARGCHEN<span>✦</span><small>بارچین</small></div>
+ <label class="search">⌕ <input id="search" placeholder="جستجو در میان محصولات و دسته‌بندی‌ها..." aria-label="جستجو"></label>
+ <div class="head-actions">
+  <button class="icon-btn" aria-label="علاقه‌مندی‌ها" onclick="toast('فهرست علاقه‌مندی‌ها در این نسخه نمایشی است')">♡</button>
+  <button class="icon-btn" aria-label="سبد خرید" onclick="showCart()">▣<span class="count" id="count">۰</span></button>
+ </div>
+</header></div></div>
+<div class="wrap"><nav class="nav"><a class="hot" href="#home">خانه</a><a href="#categories">دسته‌بندی‌ها</a><a href="#showroom">اتاق نمایش</a><a href="#products">محصولات</a><a href="#special">پیشنهادهای ویژه</a><a href="#about">درباره بارچین</a><a href="#contact">تماس با ما</a></nav></div>
+
+<main class="wrap" id="home">
+<section class="hero"><div class="hero-inner">
+ <div class="hero-copy">
+  <span class="eyebrow">THE ART OF BETTER CHOICE · BARGCHEN</span>
+  <h1>انتخابی فراتر از<br><em>یک خرید معمولی</em></h1>
+  <p>دنیایی از طراحی هوشمند، زیبایی و کاربرد؛ مجموعه‌ای از انتخاب‌های خاص برای کسانی که به کیفیت و جزئیات اهمیت می‌دهند. حالا هر محصول را از همه زاویه‌ها ببینید.</p>
+  <div class="hero-buttons">
+   <button class="primary" onclick="document.getElementById('showroom').scrollIntoView({behavior:'smooth'})">ورود به اتاق نمایش <span>←</span></button>
+   <button class="secondary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">کشف محصولات</button>
+  </div>
+ </div>
+ <div class="hero-visual">
+  <div class="slot" data-slot="hero" data-model="headphones" data-fit="0.82" data-hero="1" role="img" aria-label="هدفون سه‌بعدی"><span class="glyph">ب</span></div>
+  <div class="float-card one"><b>انتخاب‌های خاص</b><small>طراحی · کیفیت · تجربه</small></div>
+  <div class="float-card two"><b>جزئیات، تفاوت می‌سازند</b><small>با بارچین متفاوت انتخاب کن</small></div>
+  <span class="hint">بکش و بچرخان ↔</span>
+ </div>
+</div></section>
+
+<section class="trust">
+ <div class="trust-item"><span class="trust-icon">✧</span><div><b>انتخاب هوشمندانه</b><small>محصولات منتخب و کاربردی</small></div></div>
+ <div class="trust-item"><span class="trust-icon">◇</span><div><b>تجربه خرید ساده</b><small>مسیر روشن تا انتخاب نهایی</small></div></div>
+ <div class="trust-item"><span class="trust-icon">◷</span><div><b>پشتیبانی پاسخ‌گو</b><small>همراه شما در مسیر خرید</small></div></div>
+ <div class="trust-item"><span class="trust-icon">⌂</span><div><b>تنوع برای زندگی</b><small>از خانه تا تکنولوژی</small></div></div>
+</section>
+
+<section class="section" id="categories">
+ <div class="section-head"><div><span class="kicker">EXPLORE COLLECTIONS</span><h2>دنیای بارچین را کشف کن</h2><p>برای هر سلیقه، یک انتخاب متفاوت</p></div><button class="view-all" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">مشاهده همه محصولات ←</button></div>
+ <div class="categories">
+  <article class="category" onclick="filter('خانه')"><div class="stage"><div class="slot" data-slot="c-home" data-model="lamp" data-fit="1.05"><span class="glyph">خ</span></div></div><div class="meta"><b>خانه و دکور</b><small>جزئیات زیبا برای فضای زندگی</small><span class="arrow">↙</span></div></article>
+  <article class="category" onclick="filter('دیجیتال')"><div class="stage"><div class="slot" data-slot="c-tech" data-model="speaker" data-fit="1.05"><span class="glyph">د</span></div></div><div class="meta"><b>تکنولوژی و دیجیتال</b><small>هوشمند، مدرن و کاربردی</small><span class="arrow">↙</span></div></article>
+  <article class="category" onclick="filter('مد و پوشاک')"><div class="stage"><div class="slot" data-slot="c-fashion" data-model="glasses" data-fit="1.05"><span class="glyph">م</span></div></div><div class="meta"><b>مد و اکسسوری</b><small>استایل با امضای شخصی</small><span class="arrow">↙</span></div></article>
+  <article class="category" onclick="filter('شخصی')"><div class="stage"><div class="slot" data-slot="c-life" data-model="mug" data-fit="1.05"><span class="glyph">س</span></div></div><div class="meta"><b>سبک زندگی</b><small>همراه لحظه‌های روزمره</small><span class="arrow">↙</span></div></article>
+ </div>
+</section>
+
+<section class="section" id="showroom">
+ <div class="section-head"><div><span class="kicker">3D SHOWROOM</span><h2>اتاق نمایش سه‌بعدی</h2><p>محصول را بکشید و از هر زاویه‌ای ببینید</p></div></div>
+ <div class="show">
+  <div class="show-panel">
+   <span class="cat" id="showCat"></span>
+   <h3 id="showName"></h3>
+   <p id="showDesc"></p>
+   <div class="show-price"><span id="showPrice"></span><small id="showOld"></small></div>
+   <div><button class="primary" id="showAdd">افزودن به سبد خرید +</button></div>
+   <div class="thumbs" id="thumbs" role="tablist" aria-label="انتخاب محصول"></div>
+  </div>
+  <div class="show-stage"><div class="slot" data-slot="show" data-model="headphones" data-fit="0.95" role="img" aria-label="محصول سه‌بعدی"><span class="glyph">ب</span></div></div>
+ </div>
+</section>
+
+<section class="section" id="products">
+ <div class="section-head"><div><span class="kicker">CURATED FOR YOU</span><h2>منتخب‌های این هفته</h2><p>محصولاتی برای تجربه‌ای متفاوت</p></div><span class="kicker">BARGCHEN SELECTION</span></div>
+ <div class="filters">
+  <button class="active" onclick="filter('همه',this)">همه محصولات</button>
+  <button onclick="filter('خانه',this)">خانه و دکور</button>
+  <button onclick="filter('دیجیتال',this)">دیجیتال</button>
+  <button onclick="filter('مد و پوشاک',this)">مد و اکسسوری</button>
+  <button onclick="filter('شخصی',this)">سبک زندگی</button>
+ </div>
+ <div class="products" id="grid"></div>
+</section>
+
+<section class="promo" id="special">
+ <div class="promo-card" data-tilt><span class="kicker">DESIGN YOUR SPACE</span><h3>زیبایی در جزئیات خانه</h3><p>انتخاب‌هایی که به فضای روزمره شخصیت می‌بخشند؛ ساده، کاربردی و چشم‌نواز.</p><button class="secondary" onclick="filter('خانه')">دیدن محصولات خانه ←</button></div>
+ <div class="promo-card" data-tilt><span class="kicker">TECH MEETS LIFE</span><h3>تکنولوژی، به سبک تو</h3><p>ابزارهای کاربردی و طراحی مدرن برای همراهی در لحظه‌های هر روز.</p><button class="secondary" onclick="filter('دیجیتال')">کشف دنیای دیجیتال ←</button></div>
+</section>
+</main>
+
+<footer class="footer" id="about"><div class="wrap">
+ <div class="footer-grid">
+  <div><div class="brand">BARGCHEN<span>✦</span><small>بارچین</small></div><p>بارچین؛ جایی برای کشف انتخاب‌های خاص، کاربردی و خوش‌ساخت. تجربه‌ای ساده‌تر برای خریدی آگاهانه‌تر.</p></div>
+  <div><h4>دسترسی سریع</h4><a href="#home">صفحه اصلی</a><a href="#categories">دسته‌بندی‌ها</a><a href="#products">محصولات</a></div>
+  <div><h4>راهنمای خرید</h4><a href="#contact">نحوه ثبت سفارش</a><a href="#contact">پیگیری سفارش</a><a href="#contact">پرسش‌های متداول</a></div>
+  <div id="contact"><h4>ارتباط با بارچین</h4><p>برای دریافت اطلاعات خرید و پشتیبانی، از راه ارتباطی فروشگاه استفاده کنید.</p><a href="mailto:hello@bargchen.ir">hello@bargchen.ir</a></div>
+ </div>
+ <div class="copyright"><span>© ۲۰۲۶ BARGCHEN — تمامی حقوق محفوظ است.</span><span>ساخته‌شده برای تجربه‌ای بهتر از خرید · <button class="preview-admin-link" onclick="openAdmin()">مدیریت فروشگاه</button></span></div>
+</div></footer>
+
+<aside class="cart-panel" id="cart" aria-label="سبد خرید">
+ <div class="cart-head"><h3>سبد خرید شما</h3><button class="close" onclick="hideCart()" aria-label="بستن">✕</button></div>
+ <div id="cartitems" class="cart-items empty">سبد خرید شما هنوز خالی است.</div>
+ <div class="cart-total"><span>جمع کل</span><strong id="total">۰ تومان</strong></div>
+ <button class="primary checkout" onclick="checkout()">ادامه و ثبت درخواست خرید</button>
+</aside>
+<div class="toast" id="toast" role="status"></div>
+<div class="dialog-backdrop" id="checkoutDialog" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" onclick="if(event.target===this)closeDialog('checkoutDialog')">
+ <section class="dialog"><div class="dialog-head"><h2 id="checkoutTitle">ثبت درخواست خرید</h2><button class="dialog-close" onclick="closeDialog('checkoutDialog')" aria-label="بستن">✕</button></div>
+  <div id="checkoutSummary" class="admin-note"></div>
+  <form id="checkoutForm"><div class="field-grid">
+   <div class="field"><label for="buyerName">نام و نام خانوادگی</label><input id="buyerName" name="name" required maxlength="80" autocomplete="name"></div>
+   <div class="field"><label for="buyerPhone">شماره تماس</label><input id="buyerPhone" name="phone" required inputmode="tel" autocomplete="tel" maxlength="20" placeholder="09xxxxxxxxx"></div>
+   <div class="field full"><label for="buyerAddress">نشانی تحویل</label><textarea id="buyerAddress" name="address" required maxlength="500" autocomplete="street-address"></textarea></div>
+   <div class="field full"><label for="buyerNote">توضیحات (اختیاری)</label><textarea id="buyerNote" name="note" maxlength="500"></textarea></div>
+  </div><div class="dialog-actions"><button class="primary" type="submit">ثبت درخواست</button><button class="secondary" type="button" onclick="closeDialog('checkoutDialog')">بازگشت</button></div></form>
+ </section>
+</div>
+<div class="dialog-backdrop" id="adminDialog" role="dialog" aria-modal="true" aria-labelledby="adminTitle" onclick="if(event.target===this)closeDialog('adminDialog')">
+ <section class="dialog wide"><div class="dialog-head"><h2 id="adminTitle">پیشخوان مدیریت بارچین</h2><button class="dialog-close" onclick="closeDialog('adminDialog')" aria-label="بستن">✕</button></div>
+  <div class="admin-note">این پیش‌نمایش به‌صورت محلی در همین مرورگر کار می‌کند. برای انتشار واقعی، باید API امن و پایگاه داده Cloudflare متصل شود؛ اطلاعات این نسخه بین دستگاه‌ها همگام نمی‌شود.</div>
+  <div class="admin-stats" id="adminStats"></div>
+  <div class="admin-tabs"><button class="active" data-tab="products" onclick="adminTab('products',this)">محصولات</button><button data-tab="orders" onclick="adminTab('orders',this)">سفارش‌ها</button><button data-tab="customers" onclick="adminTab('customers',this)">مشتریان</button><button data-tab="backup" onclick="adminTab('backup',this)">پشتیبان‌گیری</button></div>
+  <div id="adminContent"></div>
+ </section>
+</div>
+<div class="dialog-backdrop" id="productDialog" role="dialog" aria-modal="true" aria-labelledby="productDialogTitle" onclick="if(event.target===this)closeDialog('productDialog')">
+ <section class="dialog"><div class="dialog-head"><h2 id="productDialogTitle">محصول جدید</h2><button class="dialog-close" onclick="closeDialog('productDialog')" aria-label="بستن">✕</button></div>
+ <form id="productForm"><input type="hidden" id="editProductId"><div class="field-grid">
+  <div class="field full"><label for="prodName">نام محصول</label><input id="prodName" required maxlength="100"></div>
+  <div class="field"><label for="prodCategory">دسته‌بندی</label><select id="prodCategory"><option>خانه</option><option>دیجیتال</option><option>مد و پوشاک</option><option>شخصی</option></select></div>
+  <div class="field"><label for="prodModel">مدل سه‌بعدی</label><select id="prodModel"><option value="headphones">هدفون</option><option value="bag">کیف</option><option value="lamp">چراغ</option><option value="mug">ماگ</option><option value="clock">ساعت</option><option value="glasses">عینک</option><option value="speaker">اسپیکر</option><option value="bangle">اکسسوری</option></select></div>
+  <div class="field"><label for="prodPrice">قیمت (تومان)</label><input id="prodPrice" type="number" min="0" step="1000" required></div>
+  <div class="field"><label for="prodOld">قیمت قبلی (اختیاری)</label><input id="prodOld" type="number" min="0" step="1000"></div>
+  <div class="field"><label for="prodStock">موجودی</label><input id="prodStock" type="number" min="0" step="1" value="10"></div>
+  <div class="field"><label for="prodTag">برچسب</label><input id="prodTag" maxlength="30" value="جدید"></div>
+  <div class="field full"><label for="prodDesc">توضیحات</label><textarea id="prodDesc" maxlength="240"></textarea></div>
+ </div><div class="dialog-actions"><button class="primary" type="submit">ذخیره محصول</button><button class="secondary" type="button" onclick="closeDialog('productDialog')">انصراف</button></div></form></section>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const defaultProducts=[
+ {id:1,n:'هدفون بی‌سیم استودیویی',c:'دیجیتال',m:'headphones',p:1290000,old:1590000,d:'صدای شفاف با طراحی مینیمال',tag:'پیشنهاد ویژه'},
+ {id:2,n:'کیف دستی طراحی مدرن',c:'مد و پوشاک',m:'bag',p:890000,old:0,d:'فرم زیبا، مناسب استفاده روزانه',tag:'منتخب'},
+ {id:3,n:'چراغ رومیزی مینیمال',c:'خانه',m:'lamp',p:690000,old:0,d:'نور گرم برای فضای دلنشین',tag:'طراحی خاص'},
+ {id:4,n:'ماگ سرامیکی خاص',c:'شخصی',m:'mug',p:280000,old:0,d:'سادگی زیبا برای لحظه‌های آرام',tag:'محبوب'},
+ {id:5,n:'ساعت رومیزی مدرن',c:'خانه',m:'clock',p:540000,old:0,d:'ترکیب فرم دقیق و ظاهر شیک',tag:'جدید'},
+ {id:6,n:'عینک آفتابی کلاسیک',c:'مد و پوشاک',m:'glasses',p:760000,old:0,d:'استایلی ماندگار و ساده',tag:'منتخب'},
+ {id:7,n:'اسپیکر بلوتوثی',c:'دیجیتال',m:'speaker',p:980000,old:0,d:'موسیقی همراه لحظه‌های تو',tag:'کاربردی'},
+ {id:8,n:'اکسسوری روزمره',c:'شخصی',m:'bangle',p:390000,old:0,d:'جزئیات کوچک با تأثیر بزرگ',tag:'خاص'}
+];
+const STORE_KEYS={products:'bargchen.products.v2',cart:'bargchen.cart.v2',orders:'bargchen.orders.v2'};
+function readStore(k,fallback){try{const v=JSON.parse(localStorage.getItem(k));return Array.isArray(v)?v:fallback}catch(_){return fallback}}
+function writeStore(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){toast('فضای ذخیره‌سازی مرورگر در دسترس نیست');return false}}
+const seeded=defaultProducts.map(x=>({...x,stock:20}));
+let products=readStore(STORE_KEYS.products,seeded);if(!products.length)products=seeded;
+let cart=readStore(STORE_KEYS.cart,[]),orders=readStore(STORE_KEYS.orders,[]),active='همه',showId=products[0]?.id||1;
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function saveProducts(){writeStore(STORE_KEYS.products,products)}
+function saveCart(){writeStore(STORE_KEYS.cart,cart)}
+function saveOrders(){writeStore(STORE_KEYS.orders,orders)}
+const toman=n=>n.toLocaleString('fa-IR')+' تومان';
+const byId=id=>products.find(p=>p.id===id);
+
+function render(){
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const list=products.filter(x=>(active==='همه'||x.c===active)&&(!q||(x.n+' '+x.c+' '+x.d).toLowerCase().includes(q)));
+ if(!products.some(x=>x.id===showId)&&products.length)showId=products[0].id;
+ document.getElementById('grid').innerHTML=list.map(x=>`<article class="product"><div class="product-photo"><span class="tag">${esc(x.tag)}</span><button class="heart" aria-label="افزودن به علاقه‌مندی" onclick="this.textContent=this.textContent==='♡'?'♥':'♡'">♡</button><button class="zoom" aria-label="نمایش در اتاق نمایش سه‌بعدی" onclick="showcase(${x.id},true)">⤢</button><div class="slot" data-slot="p${x.id}" data-model="${x.m}" role="img" aria-label="${esc(x.n)}"><span class="glyph">${x.n[0]}</span></div></div><div class="product-info"><h3>${esc(x.n)}</h3><p>${esc(x.d)}</p><div class="product-bottom"><div class="price">${toman(x.p)}<small>${x.old?'قیمت قبلی: '+toman(x.old):'قیمت محصول'}</small></div><button class="add" onclick="add(${x.id})">افزودن +</button></div></div></article>`).join('')||'<p class="none">محصولی با این مشخصات پیدا نشد.</p>';
+ if(window.__scan)window.__scan();
+}
+function filter(c,b){
+ active=c;
+ document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('active'));
+ if(b)b.classList.add('active');else{const m=[...document.querySelectorAll('.filters button')].find(x=>x.textContent.includes(c));if(m)m.classList.add('active')}
+ document.getElementById('products').scrollIntoView({behavior:'smooth'});
+ render();
+}
+function buildThumbs(){
+ document.getElementById('thumbs').innerHTML=products.map(x=>`<button role="tab" data-id="${x.id}" onclick="showcase(${x.id})">${esc(x.n)}</button>`).join('');
+}
+function showcase(id,scroll){
+ showId=id;const x=byId(id);
+ document.getElementById('showCat').textContent=x.c;
+ document.getElementById('showName').textContent=x.n;
+ document.getElementById('showDesc').textContent=x.d+'. با ماوس یا انگشت بکشید تا از همه زاویه‌ها ببینید.';
+ document.getElementById('showPrice').textContent=toman(x.p);
+ document.getElementById('showOld').textContent=x.old?'قیمت قبلی: '+toman(x.old):'';
+ document.getElementById('showAdd').onclick=()=>add(id);
+ document.querySelectorAll('#thumbs button').forEach(b=>{const on=+b.dataset.id===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on)});
+ if(window.__setShow)window.__setShow(x.m);
+ if(scroll)document.getElementById('showroom').scrollIntoView({behavior:'smooth'});
+}
+function add(id){const x=byId(id);if(!x)return;if((x.stock??999)<1){toast('این محصول فعلاً موجود نیست');return}const o=cart.find(p=>p.id===id);if(o){if(o.q>=(x.stock??999)){toast('موجودی کافی نیست');return}o.q++}else cart.push({...x,q:1});saveCart();updateCart();toast('به سبد خرید اضافه شد')}
+function updateCart(){
+ cart=cart.filter(x=>byId(x.id)).map(x=>({...x,q:Math.max(1,Math.min(999,Number(x.q)||1))}));
+ document.getElementById('count').textContent=cart.reduce((s,x)=>s+x.q,0).toLocaleString('fa-IR');
+ const el=document.getElementById('cartitems');
+ el.className=cart.length?'cart-items':'cart-items empty';
+ el.innerHTML=cart.length?cart.map(x=>`<div class="cart-item"><span>${esc(x.n)}<br><small>${toman(x.p)}</small></span><div class="qty"><button onclick="qty(${x.id},-1)" aria-label="کم کردن">−</button>${x.q.toLocaleString('fa-IR')}<button onclick="qty(${x.id},1)" aria-label="زیاد کردن">+</button></div><button class="remove" onclick="removeItem(${x.id})">حذف</button></div>`).join(''):'سبد خرید شما هنوز خالی است.';
+ document.getElementById('total').textContent=toman(cart.reduce((s,x)=>s+x.p*x.q,0));saveCart();
+}
+function qty(id,n){const x=cart.find(p=>p.id===id);if(!x)return;const product=byId(id);x.q+=n;if(x.q<=0)cart=cart.filter(p=>p.id!==id);else if(product&&x.q>(product.stock??999)){x.q=product.stock??999;toast('موجودی کافی نیست')}updateCart()}
+function removeItem(id){cart=cart.filter(p=>p.id!==id);updateCart()}
+function showCart(){document.getElementById('cart').classList.add('open')}
+function hideCart(){document.getElementById('cart').classList.remove('open')}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}
+function checkout(){if(!cart.length){toast('سبد خرید خالی است');return}document.getElementById('checkoutSummary').textContent='تعداد اقلام: '+cart.reduce((n,x)=>n+x.q,0).toLocaleString('fa-IR')+' · جمع کل: '+toman(cart.reduce((n,x)=>n+x.p*x.q,0));openDialog('checkoutDialog');document.getElementById('buyerName').focus()}
+function openDialog(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeDialog(id){document.getElementById(id).classList.remove('open');if(!document.querySelector('.dialog-backdrop.open'))document.body.style.overflow=''}
+document.getElementById('checkoutForm').addEventListener('submit',e=>{e.preventDefault();if(!cart.length)return;const f=new FormData(e.currentTarget),phone=String(f.get('phone')||'').replace(/[\s()-]/g,'');if(!/^[+\d]{8,16}$/.test(phone)){toast('شماره تماس را بررسی کنید');return}for(const item of cart){const p=byId(item.id);if(!p||item.q>(p.stock??999)){toast('موجودی یکی از محصولات کافی نیست');return}}
+ const order={id:'BC-'+Date.now().toString(36).toUpperCase(),createdAt:new Date().toISOString(),name:String(f.get('name')).trim(),phone,address:String(f.get('address')).trim(),note:String(f.get('note')||'').trim(),items:cart.map(x=>({id:x.id,n:x.n,p:x.p,q:x.q})),total:cart.reduce((n,x)=>n+x.p*x.q,0),status:'در انتظار بررسی'};
+ orders.unshift(order);saveOrders();for(const item of cart){const p=byId(item.id);if(p)p.stock=Math.max(0,(p.stock??999)-item.q)}saveProducts();cart=[];saveCart();updateCart();render();closeDialog('checkoutDialog');hideCart();e.currentTarget.reset();toast('درخواست خرید با شماره '+order.id+' در این مرورگر ثبت شد');});
+function openAdmin(){adminTab('products');openDialog('adminDialog')}
+function adminTab(tab,btn){document.querySelectorAll('.admin-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));renderAdmin(tab)}
+function renderStats(){const revenue=orders.filter(o=>o.status!=='لغو شده').reduce((n,o)=>n+o.total,0);document.getElementById('adminStats').innerHTML=[['تعداد محصولات',products.length],['کل سفارش‌ها',orders.length],['در انتظار بررسی',orders.filter(o=>o.status==='در انتظار بررسی').length],['مجموع سفارش‌ها',toman(revenue)]].map(([a,b])=>`<div class="admin-stat"><small>${esc(a)}</small><b>${esc(b)}</b></div>`).join('')}
+function renderAdmin(tab){renderStats();const root=document.getElementById('adminContent');if(tab==='products'){root.innerHTML=`<div class="dialog-actions" style="margin:0 0 12px"><button class="primary" onclick="editProduct()">+ افزودن محصول</button></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>محصول</th><th>دسته</th><th>قیمت</th><th>موجودی</th><th>عملیات</th></tr></thead><tbody>${products.map(p=>`<tr><td>${esc(p.n)}</td><td>${esc(p.c)}</td><td>${toman(p.p)}</td><td>${Number(p.stock??0).toLocaleString('fa-IR')}</td><td><button class="mini-btn" onclick="editProduct(${p.id})">ویرایش</button> <button class="mini-btn danger" onclick="deleteProduct(${p.id})">حذف</button></td></tr>`).join('')||'<tr><td colspan="5">محصولی ثبت نشده است.</td></tr>'}</tbody></table></div>`;return}
+ if(tab==='orders'){root.innerHTML=`<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>شماره</th><th>مشتری</th><th>تلفن</th><th>مبلغ</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>${orders.map(o=>`<tr><td>${esc(o.id)}</td><td>${esc(o.name)}</td><td>${esc(o.phone)}</td><td>${toman(o.total)}</td><td><select aria-label="وضعیت سفارش" onchange="setOrderStatus('${esc(o.id)}',this.value)"><option ${o.status==='در انتظار بررسی'?'selected':''}>در انتظار بررسی</option><option ${o.status==='تأیید شده'?'selected':''}>تأیید شده</option><option ${o.status==='ارسال شده'?'selected':''}>ارسال شده</option><option ${o.status==='لغو شده'?'selected':''}>لغو شده</option></select></td><td><button class="mini-btn" onclick="orderDetails('${esc(o.id)}')">جزئیات</button></td></tr>`).join('')||'<tr><td colspan="6">هنوز سفارشی ثبت نشده است.</td></tr>'}</tbody></table></div>`;return}
+ if(tab==='customers'){const customers=[...new Map(orders.map(o=>[o.phone,o])).values()];root.innerHTML=`<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>نام</th><th>شماره تماس</th><th>تعداد سفارش</th><th>آخرین نشانی</th></tr></thead><tbody>${customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${orders.filter(o=>o.phone===c.phone).length.toLocaleString('fa-IR')}</td><td>${esc(c.address)}</td></tr>`).join('')||'<tr><td colspan="4">مشتری ثبت‌شده‌ای وجود ندارد.</td></tr>'}</tbody></table></div>`;return}
+ root.innerHTML=`<p>از اطلاعات محصولات و سفارش‌ها نسخه پشتیبان JSON بگیرید یا فایل قبلی را بازیابی کنید.</p><div class="dialog-actions"><button class="primary" onclick="exportBackup()">دریافت نسخه پشتیبان</button><label class="secondary" style="cursor:pointer">بازیابی فایل<input type="file" accept="application/json,.json" hidden onchange="importBackup(event)"></label></div>`}
+function editProduct(id){const p=id?byId(id):null;document.getElementById('productDialogTitle').textContent=p?'ویرایش محصول':'افزودن محصول';document.getElementById('editProductId').value=p?.id||'';document.getElementById('prodName').value=p?.n||'';document.getElementById('prodCategory').value=p?.c||'خانه';document.getElementById('prodModel').value=p?.m||'headphones';document.getElementById('prodPrice').value=p?.p||'';document.getElementById('prodOld').value=p?.old||'';document.getElementById('prodStock').value=p?.stock??10;document.getElementById('prodTag').value=p?.tag||'جدید';document.getElementById('prodDesc').value=p?.d||'';openDialog('productDialog')}
+document.getElementById('productForm').addEventListener('submit',e=>{e.preventDefault();const id=Number(document.getElementById('editProductId').value),old=byId(id),p={id:id||Math.max(0,...products.map(x=>x.id))+1,n:document.getElementById('prodName').value.trim(),c:document.getElementById('prodCategory').value,m:document.getElementById('prodModel').value,p:Number(document.getElementById('prodPrice').value),old:Number(document.getElementById('prodOld').value)||0,stock:Number(document.getElementById('prodStock').value),tag:document.getElementById('prodTag').value.trim(),d:document.getElementById('prodDesc').value.trim()};if(!p.n||!Number.isFinite(p.p)||p.p<0||!Number.isInteger(p.stock)||p.stock<0){toast('اطلاعات محصول را بررسی کنید');return}if(old)products=products.map(x=>x.id===id?p:x);else products.push(p);saveProducts();buildThumbs();render();showcase(p.id);closeDialog('productDialog');renderAdmin('products');toast('محصول ذخیره شد')});
+function deleteProduct(id){if(!confirm('این محصول حذف شود؟'))return;products=products.filter(p=>p.id!==id);cart=cart.filter(p=>p.id!==id);saveProducts();saveCart();buildThumbs();render();if(products.length)showcase(products[0].id);updateCart();renderAdmin('products');toast('محصول حذف شد')}
+function setOrderStatus(id,status){const o=orders.find(x=>x.id===id);if(o){o.status=status;saveOrders();renderStats();toast('وضعیت سفارش به‌روزرسانی شد')}}
+function orderDetails(id){const o=orders.find(x=>x.id===id);if(!o)return;alert('شماره سفارش: '+o.id+'\nمشتری: '+o.name+'\nتلفن: '+o.phone+'\nنشانی: '+o.address+'\nاقلام: '+o.items.map(x=>x.n+' × '+x.q).join('، ')+'\nتوضیحات: '+o.note)}
+function exportBackup(){const blob=new Blob([JSON.stringify({products,orders},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='bargchen-backup.json';a.click();URL.revokeObjectURL(url)}
+function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!Array.isArray(d.products)||!Array.isArray(d.orders))throw Error();products=d.products;orders=d.orders;saveProducts();saveOrders();buildThumbs();render();updateCart();renderAdmin('products');toast('نسخه پشتیبان بازیابی شد')}catch(_){toast('فایل پشتیبان معتبر نیست')}};reader.readAsText(file);e.target.value=''}
+document.getElementById('search').addEventListener('input',render);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideCart()});
+
+/* promo card tilt */
+document.querySelectorAll('[data-tilt]').forEach(el=>{
+ el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.setProperty('--ry',(x*10)+'deg');el.style.setProperty('--rx',(-y*8)+'deg')});
+ el.addEventListener('pointerleave',()=>{el.style.setProperty('--ry','0deg');el.style.setProperty('--rx','0deg')});
+});
+
+/* ---------- 3D layer ---------- */
+(function(){
+ const root=document.documentElement;
+ if(!window.THREE){root.classList.add('no-gl');return}
+ const T=THREE;
+ const RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let FR,BR;
+ try{
+  FR=new T.WebGLRenderer({canvas:document.getElementById('fg3d'),antialias:true,alpha:true});
+  BR=new T.WebGLRenderer({canvas:document.getElementById('bg3d'),antialias:true,alpha:true});
+ }catch(e){root.classList.add('no-gl');return}
+ FR.autoClear=false;FR.setClearColor(0x000000,0);
+ FR.toneMapping=T.ACESFilmicToneMapping;FR.toneMappingExposure=1.05;
+ BR.setClearColor(0x000000,0);
+
+ /* environment for reflections */
+ function makeEnv(){
+  const s=new T.Scene();
+  const g=new T.SphereGeometry(20,32,16);const pos=g.attributes.position;const col=[];
+  const lo=new T.Color(0x6fae86),hi=new T.Color(0xffffff);
+  for(let i=0;i<pos.count;i++){const c=lo.clone().lerp(hi,(pos.getY(i)/20+1)/2);col.push(c.r,c.g,c.b)}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3));
+  s.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const panel=(x,y,z,w,h,k)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,.3),new T.MeshBasicMaterial({color:new T.Color(k,k,k)}));m.position.set(x,y,z);m.lookAt(0,0,0);s.add(m)};
+  panel(9,10,7,7,5,5);panel(-10,5,6,4,8,3);panel(0,-4,-12,10,3,2);panel(-3,12,-6,8,3,3);
+  const pm=new T.PMREMGenerator(FR);const tex=pm.fromScene(s,.03).texture;pm.dispose();return tex;
+ }
+ let envTex=null;try{envTex=makeEnv()}catch(e){}
+
+ /* contact shadow texture */
+ const shTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(8,60,34,.42)');g.addColorStop(1,'rgba(8,60,34,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new T.CanvasTexture(c)})();
+
+ /* ---- materials & helpers ---- */
+ const mat=(c,r=.45,m=.1,o)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:r,metalness:m},o||{}));
+ const Mesh=(g,m)=>new T.Mesh(g,m);
+ const GOLD=()=>mat(0xd9a441,.22,1);
+ function rr(w,h,r){const s=new T.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s}
+
+ const BUILD={
+  headphones(){
+   const g=new T.Group();
+   g.add(Mesh(new T.TorusGeometry(1.05,.075,20,80,Math.PI),mat(0x1b2b23,.35,.6)));
+   const pad=Mesh(new T.TorusGeometry(1.05,.11,16,40,Math.PI*.45),mat(0x168653,.6,.05));pad.rotation.z=Math.PI/2-Math.PI*.225;g.add(pad);
+   [-1,1].forEach(s=>{
+    const cup=new T.Group();cup.position.set(s*1.05,0,0);
+    const body=Mesh(new T.CylinderGeometry(.5,.5,.34,48),mat(0x168653,.3,.35));body.rotation.z=Math.PI/2;cup.add(body);
+    const cap=Mesh(new T.CylinderGeometry(.38,.38,.04,48),mat(0xe9f7ee,.25,.7));cap.rotation.z=Math.PI/2;cap.position.x=s*.19;cup.add(cap);
+    const dot=Mesh(new T.CylinderGeometry(.08,.08,.05,24),mat(0x168653,.3,.6));dot.rotation.z=Math.PI/2;dot.position.x=s*.215;cup.add(dot);
+    const cush=Mesh(new T.TorusGeometry(.4,.15,20,48),mat(0x14271d,.85,0));cush.rotation.y=Math.PI/2;cush.position.x=-s*.2;cup.add(cush);
+    g.add(cup);
+   });
+   return g;
+  },
+  bag(){
+   const g=new T.Group();
+   const body=Mesh(new T.ExtrudeGeometry(rr(2,1.4,.22),{depth:.7,bevelEnabled:true,bevelThickness:.12,bevelSize:.1,bevelSegments:6,curveSegments:16}),mat(0x14633f,.55,.05));
+   body.position.z=-.35;g.add(body);
+   const flap=Mesh(new T.ExtrudeGeometry(rr(2.1,.75,.2),{depth:.05,bevelEnabled:true,bevelThickness:.04,bevelSize:.04,bevelSegments:4,curveSegments:12}),mat(0x0e4a30,.5,.08));
+   flap.position.set(0,.38,.5);g.add(flap);
+   const handle=Mesh(new T.TorusGeometry(.62,.06,12,48,Math.PI),mat(0x0b3524,.5,.1));handle.position.y=.78;g.add(handle);
+   const clasp=Mesh(new T.CylinderGeometry(.11,.11,.05,32),GOLD());clasp.rotation.x=Math.PI/2;clasp.position.set(0,.0,.62);g.add(clasp);
+   return g;
+  },
+  lamp(){
+   const g=new T.Group();
+   const dark=mat(0x1b2b23,.35,.6);
+   const base=Mesh(new T.CylinderGeometry(.55,.62,.12,48),dark);base.position.y=-1.2;g.add(base);
+   const post=Mesh(new T.CylinderGeometry(.04,.04,1.34,16),dark);post.position.set(-.35,-.47,0);g.add(post);
+   const joint=Mesh(new T.SphereGeometry(.09,20,16),GOLD());joint.position.set(-.35,.2,0);g.add(joint);
+   const arm=Mesh(new T.CylinderGeometry(.035,.035,.97,16),dark);arm.position.set(.1,.375,0);arm.rotation.z=-1.2;g.add(arm);
+   const head=new T.Group();head.position.set(.55,.55,0);head.rotation.z=-.55;
+   const pts=[[.06,.35],[.18,.3],[.4,.05],[.54,-.22],[.52,-.24],[.38,-.17],[.16,.22],[.1,.3]].map(p=>new T.Vector2(p[0],p[1]));
+   head.add(Mesh(new T.LatheGeometry(pts,48),mat(0x168653,.3,.35,{side:T.DoubleSide})));
+   const bulb=Mesh(new T.SphereGeometry(.16,24,16),new T.MeshStandardMaterial({color:0xfff4c8,emissive:0xffd777,emissiveIntensity:1.6,roughness:.3}));bulb.position.y=-.08;head.add(bulb);
+   g.add(head);
+   return g;
+  },
+  mug(){
+   const g=new T.Group();
+   const cream=mat(0xf3efe6,.35,.05,{side:T.DoubleSide});
+   g.add(Mesh(new T.CylinderGeometry(.7,.62,1.2,64,1,true),cream));
+   const bot=Mesh(new T.CircleGeometry(.62,48),cream);bot.rotation.x=Math.PI/2;bot.position.y=-.6;g.add(bot);
+   const cof=Mesh(new T.CircleGeometry(.67,48),mat(0x4a2d1b,.25,.1));cof.rotation.x=-Math.PI/2;cof.position.y=.46;g.add(cof);
+   const rim=Mesh(new T.TorusGeometry(.7,.035,12,64),mat(0xf3efe6,.3,.05));rim.rotation.x=Math.PI/2;rim.position.y=.6;g.add(rim);
+   const stripe=Mesh(new T.CylinderGeometry(.657,.642,.22,64,1,true),mat(0x168653,.4,.1,{side:T.DoubleSide}));stripe.position.y=-.25;g.add(stripe);
+   const handle=Mesh(new T.TorusGeometry(.38,.09,16,32,Math.PI),cream);handle.rotation.z=-Math.PI/2;handle.position.set(.7,0,0);g.add(handle);
+   return g;
+  },
+  clock(){
+   const g=new T.Group();
+   const body=Mesh(new T.CylinderGeometry(1,1,.32,64),mat(0x0f4a31,.4,.3));body.rotation.x=Math.PI/2;g.add(body);
+   const face=Mesh(new T.CylinderGeometry(.88,.88,.02,64),mat(0xf6f3ea,.5,0));face.rotation.x=Math.PI/2;face.position.z=.165;g.add(face);
+   const bez=Mesh(new T.TorusGeometry(.95,.05,16,64),GOLD());bez.position.z=.16;g.add(bez);
+   for(let i=0;i<12;i++){const a=i/12*Math.PI*2,t=Mesh(new T.BoxGeometry(i%3?.035:.06,i%3?.1:.16,.02),mat(0x14271d,.5,.2));t.position.set(Math.sin(a)*.74,Math.cos(a)*.74,.18);t.rotation.z=-a;g.add(t)}
+   const hand=(w,l,c)=>{const geo=new T.BoxGeometry(w,l,.02);geo.translate(0,l/2-.06,0);const m=Mesh(geo,mat(c,.4,.3));m.position.z=.2;g.add(m);return m};
+   const hh=hand(.07,.45,0x14271d),mh=hand(.05,.68,0x14271d),sh=hand(.02,.74,0xe4684f);
+   const hub=Mesh(new T.CylinderGeometry(.05,.05,.05,20),GOLD());hub.rotation.x=Math.PI/2;hub.position.z=.22;g.add(hub);
+   [-1,1].forEach(s=>{const f=Mesh(new T.CylinderGeometry(.08,.1,.22,20),mat(0x0b3524,.4,.4));f.position.set(s*.62,-1.02,-.02);f.rotation.z=s*.5;g.add(f)});
+   g.userData.update=()=>{const d=new Date(),sec=d.getSeconds()+d.getMilliseconds()/1000,min=d.getMinutes()+sec/60,hr=(d.getHours()%12)+min/60;sh.rotation.z=-sec/60*Math.PI*2;mh.rotation.z=-min/60*Math.PI*2;hh.rotation.z=-hr/12*Math.PI*2};
+   return g;
+  },
+  glasses(){
+   const g=new T.Group();
+   const frame=mat(0x14271d,.3,.5),lens=mat(0x1f6b4a,.08,.3,{transparent:true,opacity:.72});
+   [-1,1].forEach(s=>{
+    const fr=Mesh(new T.TorusGeometry(.56,.065,16,48),frame);fr.scale.set(1,.8,1);fr.position.x=s*.68;g.add(fr);
+    const ln=Mesh(new T.SphereGeometry(.56,32,16),lens);ln.scale.set(1,.8,.12);ln.position.x=s*.68;g.add(ln);
+    const tp=Mesh(new T.BoxGeometry(.07,.07,1.5),frame);tp.position.set(s*1.24,.18,-.75);g.add(tp);
+    const tip=Mesh(new T.BoxGeometry(.07,.2,.07),frame);tip.position.set(s*1.24,.1,-1.48);g.add(tip);
+   });
+   const br=Mesh(new T.TorusGeometry(.17,.045,12,24,Math.PI),frame);br.position.set(0,.1,0);g.add(br);
+   return g;
+  },
+  speaker(){
+   const g=new T.Group();
+   const grill=mat(0x0e5a3a,.65,.25);
+   const body=Mesh(new T.CylinderGeometry(.62,.62,1.9,64),grill);body.rotation.z=Math.PI/2;g.add(body);
+   for(let i=-4;i<=4;i++){const r=Mesh(new T.TorusGeometry(.63,.014,8,64),mat(0x8fd3a8,.4,.6));r.rotation.y=Math.PI/2;r.position.x=i*.2;g.add(r)}
+   [-1,1].forEach(s=>{const c=Mesh(new T.CylinderGeometry(.64,.64,.09,48),mat(0xf3efe6,.3,.7));c.rotation.z=Math.PI/2;c.position.x=s*.97;g.add(c)});
+   [-.3,0,.3].forEach(x=>{const b=Mesh(new T.SphereGeometry(.07,16,12),mat(0xf3efe6,.3,.5));b.position.set(x,.63,0);b.scale.y=.6;g.add(b)});
+   const strap=Mesh(new T.TorusGeometry(.3,.04,12,32),mat(0x14271d,.5,.2));strap.rotation.y=Math.PI/2;strap.position.set(-.97,.56,0);g.add(strap);
+   return g;
+  },
+  bangle(){
+   const g=new T.Group();
+   const ring=Mesh(new T.TorusGeometry(.95,.13,32,96),GOLD());ring.rotation.x=Math.PI/2.3;g.add(ring);
+   const inner=Mesh(new T.TorusGeometry(.95,.035,16,96),mat(0xe9f7ee,.2,.9));inner.rotation.x=Math.PI/2.3;inner.position.z=.25;inner.position.y=.1;g.add(inner);
+   const gem=Mesh(new T.OctahedronGeometry(.27),mat(0x16a35f,.12,.3,{emissive:0x0b6b3a,emissiveIntensity:.5}));gem.scale.y=1.3;gem.position.set(0,.98,.32);g.add(gem);
+   for(let i=-2;i<=2;i++){if(!i)continue;const a=Math.PI/2+i*.22,s=Mesh(new T.SphereGeometry(.06,16,12),mat(0xe9f7ee,.2,.9));s.position.set(Math.cos(a)*.95,Math.sin(a)*.95*Math.sin(Math.PI/2.3)+.0,.32);g.add(s)}
+   return g;
+  }
+ };
+
+ /* ---- slots ---- */
+ const cache={},slots=[];
+ function disposeObj(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose()})}
+ function fitModel(g){
+  const holder=new T.Group();holder.add(g);
+  const box=new T.Box3().setFromObject(g),size=new T.Vector3(),ctr=new T.Vector3();
+  box.getSize(size);box.getCenter(ctr);g.position.sub(ctr);
+  const sc=2.6/Math.max(size.x,size.y,size.z);holder.scale.setScalar(sc);
+  return {holder,h:size.y*sc};
+ }
+ function setModel(s,key,pop){
+  if(s.holder){s.wrap.remove(s.holder);disposeObj(s.holder)}
+  const g=(BUILD[key]||BUILD.headphones)();
+  const f=fitModel(g);
+  s.holder=f.holder;s.model=g;s.key=key;s.wrap.add(f.holder);
+  s.shadow.position.y=-f.h/2-.18;
+  s.pop=pop&&!RM?0:1;
+ }
+ function createSlot(id,key,opt){
+  const scene=new T.Scene();
+  if(envTex)scene.environment=envTex;
+  scene.add(new T.HemisphereLight(0xffffff,0x9fd0b0,.55));
+  const d=new T.DirectionalLight(0xffffff,1.25);d.position.set(3,4,5);scene.add(d);
+  const r=new T.DirectionalLight(0x9de8bd,.8);r.position.set(-4,2,-3);scene.add(r);
+  const cam=new T.PerspectiveCamera(32,1,.1,60);
+  const s={id,scene,cam,wrap:new T.Group(),rotY:Math.random()*6,vel:0,tx:0,ty:0,cx:0,cy:0,hover:false,drag:false,lx:0,pop:1,fit:opt.fit||1,phase:Math.random()*6,hero:!!opt.hero,extras:null,key:null};
+  scene.add(s.wrap);
+  s.shadow=Mesh(new T.PlaneGeometry(3.2,3.2),new T.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false}));
+  s.shadow.rotation.x=-Math.PI/2;scene.add(s.shadow);
+  setModel(s,key,false);
+  if(s.hero)addOrbits(s);
+  return s;
+ }
+ function addOrbits(s){
+  const grp=new T.Group();
+  const r1=Mesh(new T.TorusGeometry(1.95,.012,8,160),new T.MeshBasicMaterial({color:0x35a86f,transparent:true,opacity:.7}));r1.rotation.x=1.25;
+  const r2=Mesh(new T.TorusGeometry(1.6,.01,8,140),new T.MeshBasicMaterial({color:0x8fd3a8,transparent:true,opacity:.6}));r2.rotation.set(.5,.9,0);
+  const o1=Mesh(new T.SphereGeometry(.1,16,12),new T.MeshBasicMaterial({color:0xe4684f}));r1.add(o1);
+  const o2=Mesh(new T.SphereGeometry(.07,16,12),new T.MeshBasicMaterial({color:0x168653}));r2.add(o2);
+  const o3=Mesh(new T.SphereGeometry(.06,16,12),new T.MeshBasicMaterial({color:0xa9e2bd}));r1.add(o3);
+  grp.add(r1,r2);s.scene.add(grp);
+  s.extras=t=>{grp.rotation.y=t*.22;o1.position.set(Math.cos(t*.9)*1.95,Math.sin(t*.9)*1.95,0);o2.position.set(Math.cos(-t*1.1)*1.6,Math.sin(-t*1.1)*1.6,0);o3.position.set(Math.cos(t*.5+2)*1.95,Math.sin(t*.5+2)*1.95,0)};
+ }
+ function bind(s,el){
+  if(el._b)return;el._b=1;
+  el.addEventListener('pointerenter',()=>{s.hover=true});
+  el.addEventListener('pointerleave',()=>{s.hover=false;s.tx=0;s.ty=0;s.drag=false});
+  el.addEventListener('pointermove',e=>{
+   const r=el.getBoundingClientRect();s.tx=((e.clientX-r.left)/r.width-.5)*2;s.ty=((e.clientY-r.top)/r.height-.5)*2;
+   if(s.drag){s.vel=(e.clientX-s.lx)*.012;s.rotY+=s.vel;s.lx=e.clientX}
+  });
+  el.addEventListener('pointerdown',e=>{s.drag=true;s.lx=e.clientX;s.vel=0;try{el.setPointerCapture(e.pointerId)}catch(_){}});
+  const up=()=>{s.drag=false};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+ }
+ window.__scan=function(){
+  slots.length=0;
+  document.querySelectorAll('.slot').forEach(el=>{
+   const id=el.dataset.slot,key=el.dataset.model;
+   let s=cache[id];
+   if(!s)s=cache[id]=createSlot(id,key,{fit:parseFloat(el.dataset.fit)||1,hero:el.dataset.hero==='1'});
+   s.el=el;bind(s,el);slots.push(s);
+  });
+ };
+ window.__setShow=function(key){const s=cache.show;if(s&&s.key!==key)setModel(s,key,true)};
+
+ /* ---- background leaves ---- */
+ const bgScene=new T.Scene();bgScene.fog=new T.Fog(0xeaf3ea,12,42);
+ const bgCam=new T.PerspectiveCamera(50,1,.1,80);bgCam.position.set(0,0,14);
+ bgScene.add(new T.AmbientLight(0xffffff,.9));
+ const bl=new T.DirectionalLight(0xffffff,.9);bl.position.set(4,8,6);bgScene.add(bl);
+ function leafGeo(){
+  const sh=new T.Shape();sh.moveTo(0,0);sh.bezierCurveTo(.95,.35,.8,1.3,0,2);sh.bezierCurveTo(-.8,1.3,-.95,.35,0,0);
+  const g=new T.ShapeGeometry(sh,12);const p=g.attributes.position,cols=[];
+  const a=new T.Color(0x0e6840),b=new T.Color(0x8fd3a8);
+  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);p.setZ(i,Math.abs(x)*.5-y*.05);const c=a.clone().lerp(b,y/2);cols.push(c.r,c.g,c.b)}
+  g.setAttribute('color',new T.Float32BufferAttribute(cols,3));g.computeVertexNormals();return g;
+ }
+ const LG=leafGeo();
+ const LM=[0xffffff,0xe3f6e8,0xcdeed6,0xf1fbe8].map(c=>new T.MeshLambertMaterial({color:c,vertexColors:true,side:T.DoubleSide,transparent:true,opacity:.82}));
+ const leaves=[],N=innerWidth<700?44:80;
+ for(let i=0;i<N;i++){
+  const m=Mesh(LG,LM[i%4]);m.scale.setScalar(.5+Math.random()*1.1);
+  m.position.set((Math.random()-.5)*36,4-Math.random()*46,-9+Math.random()*13);
+  m.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+  m.userData={sp:new T.Vector3((Math.random()-.5)*.5,(Math.random()-.5)*.5,(Math.random()-.5)*.5),ph:Math.random()*6,bx:m.position.x,bz:m.position.z};
+  bgScene.add(m);leaves.push(m);
+ }
+
+ /* ---- loop ---- */
+ let mx=0,my=0,camY=0,last=performance.now();
+ addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+ function resize(){
+  const w=innerWidth,h=innerHeight,pr=Math.min(devicePixelRatio||1,2);
+  [FR,BR].forEach(r=>{r.setPixelRatio(pr);r.setSize(w,h,false)});
+  bgCam.aspect=w/h;bgCam.updateProjectionMatrix();
+ }
+ addEventListener('resize',resize);resize();
+ const ease=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+ const tanHalf=Math.tan(T.MathUtils.degToRad(16));
+ function frame(now){
+  requestAnimationFrame(frame);
+  if(document.hidden)return;
+  const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000,mo=RM?0:1;
+  const H=innerHeight,W=innerWidth,sy=scrollY;
+  const maxS=Math.max(1,document.documentElement.scrollHeight-H);
+  /* leaves */
+  const targetY=-(sy/maxS)*38;camY+=(targetY-camY)*Math.min(1,dt*4);
+  bgCam.position.set(mx*1.6,camY-my*.8,14);bgCam.lookAt(mx*.6,camY,0);
+  leaves.forEach(l=>{const u=l.userData;l.rotation.x+=u.sp.x*dt*mo;l.rotation.y+=u.sp.y*dt*mo;l.rotation.z+=u.sp.z*dt*mo;l.position.x=u.bx+Math.sin(t*.35+u.ph)*.6*mo});
+  BR.render(bgScene,bgCam);
+  /* products */
+  FR.setScissorTest(false);FR.clear();FR.setScissorTest(true);
+  for(const s of slots){
+   const el=s.el;if(!el||!el.isConnected)continue;
+   const r=el.getBoundingClientRect();
+   if(r.bottom<0||r.top>H||r.right<0||r.left>W||r.width<4||r.height<4)continue;
+   const asp=r.width/r.height;
+   if(s.cam.aspect!==asp){s.cam.aspect=asp;s.cam.updateProjectionMatrix()}
+   const dist=1.75/(tanHalf*Math.min(1,asp))/s.fit;
+   s.cam.position.set(0,.35,dist);s.cam.lookAt(0,0,0);
+   if(!s.drag){s.rotY+=((s.hover?.18:.55)*dt*mo)+s.vel;s.vel*=.92}
+   s.cx+=(s.tx-s.cx)*.1;s.cy+=(s.ty-s.cy)*.1;
+   const w=s.wrap;
+   w.rotation.y=s.rotY+s.cx*.35+(s.hero?sy*.0035*mo:0);
+   w.rotation.x=.08+s.cy*.18;
+   w.position.y=Math.sin(t*1.3+s.phase)*.07*mo;
+   if(s.pop<1){s.pop=Math.min(1,s.pop+dt*2.2);w.scale.setScalar(Math.max(.01,ease(s.pop)))}else w.scale.setScalar(1);
+   if(s.model&&s.model.userData.update)s.model.userData.update();
+   if(s.extras)s.extras(t*mo);
+   const vx=r.left,vy=H-r.bottom;
+   FR.setViewport(vx,vy,r.width,r.height);FR.setScissor(vx,vy,r.width,r.height);
+   FR.render(s.scene,s.cam);
+  }
+ }
+ requestAnimationFrame(frame);
+})();
+
+buildThumbs();render();if(products.length)showcase(showId);updateCart();
+</script>
+</body>
+</html>
